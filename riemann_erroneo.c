@@ -22,6 +22,9 @@ double length = LIMIT - BASE;
 double numRectxThread = (double)(MAXRECT/MAXTHREAD);
 double base_length = 0;
 double sumTotal = 0;
+// aqui va la definicion del semaforo
+
+
 
 double function(double x) {
 	return x * x; 
@@ -32,7 +35,9 @@ void* calcular(void *arg) {
 
 
 	for (int i = 0; i < numRectxThread; i++) {
+		//semwait
 		sumTotal += function(lowlimit + i*base_length) * base_length;
+		//semsignal
 	}
 	return 0;
 }
@@ -43,10 +48,18 @@ int main(int argc, char** argv) {
 
 	base_length = length/MAXRECT;
 	printf("base length: %lf numRectxThread: %lf\n",base_length, numRectxThread);
+
+	//Aqui se debe crear el semaforo
+
 	for (int i = 0; i < MAXTHREAD; i++) {
 		taskids[i] = i;
+
 		pthread_create(&threads[i], NULL, calcular, (void*)taskids[i]);
 	}
+
+	// aqui se destruye el semaforo
+
+
 	printf("Suma total %lf\n",sumTotal);
 	pthread_exit(NULL);
 }
