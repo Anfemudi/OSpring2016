@@ -32,18 +32,21 @@ double function(double x) {
 	return x * x; 
 }
 void* calcular(void *arg) {
+	double tmp=0;
 	long id = (long) arg;
 	double lowlimit = id*base_length*numRectxThread;
 
-
+	
 	for (int i = 0; i < numRectxThread; i++) {
-		//semwait
-		sem_wait(&semaforo);
-		sumTotal += function(lowlimit + i*base_length) * base_length;
+		//semwait	
+		tmp += function(lowlimit + i*base_length) * base_length;
 		//semsignal (sem_post)
-		sem_post(&semaforo);
+		
 
 	}
+	sem_wait(&semaforo);
+	sumTotal +=tmp;
+	sem_post(&semaforo);
 	pthread_exit(0);
 	return 0;
 
