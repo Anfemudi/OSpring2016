@@ -1,0 +1,13 @@
+git init.
+git config --global user.email correo
+git config --global user.name nombre de ususario
+
+
+
+
+
+
+git add
+git commit -m "algo"
+
+git push origin master
