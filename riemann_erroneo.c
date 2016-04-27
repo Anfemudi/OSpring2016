@@ -12,8 +12,9 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <math.h>
+#include <semaphore.h>
 
-#define MAXRECT 1000000
+#define MAXRECT 100000000
 #define MAXTHREAD 10
 #define BASE 0.0
 #define LIMIT 1.0
@@ -22,6 +23,7 @@ double length = LIMIT - BASE;
 double numRectxThread = (double)(MAXRECT/MAXTHREAD);
 double base_length = 0;
 double sumTotal = 0;
+sem_t semaforo;
 // aqui va la definicion del semaforo
 
 
@@ -36,10 +38,15 @@ void* calcular(void *arg) {
 
 	for (int i = 0; i < numRectxThread; i++) {
 		//semwait
+		sem_wait(&semaforo);
 		sumTotal += function(lowlimit + i*base_length) * base_length;
-		//semsignal
+		//semsignal (sem_post)
+		sem_post(&semaforo);
+
 	}
+	pthread_exit(0);
 	return 0;
+
 }
 
 int main(int argc, char** argv) {
@@ -51,15 +58,25 @@ int main(int argc, char** argv) {
 
 	//Aqui se debe crear el semaforo
 
+	sem_init(&semaforo,0,1);
+
 	for (int i = 0; i < MAXTHREAD; i++) {
 		taskids[i] = i;
 
 		pthread_create(&threads[i], NULL, calcular, (void*)taskids[i]);
 	}
 
+	for (int i = 0; i < MAXTHREAD; i++){
+		pthread_join(threads[i],NULL);
+	}
+
+	
+
 	// aqui se destruye el semaforo
 
 
 	printf("Suma total %lf\n",sumTotal);
 	pthread_exit(NULL);
+	sem_destroy(&semaforo);
 }
+
