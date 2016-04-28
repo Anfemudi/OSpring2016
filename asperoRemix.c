@@ -8,14 +8,15 @@ sem_t semaforo;
 
 void printearA(){
 
-
+	sleep(1);
 	printf("Quiere  A%s\n");
+	sem_post(&semaforo);
 }
 
 
 void printearB(){
 
-
+	sem_wait(&semaforo);
 	printf("Quiere  B%s\n");
 }
 
@@ -25,21 +26,17 @@ void printearB(){
 
 int main(int argc, char** argv) {
 
-	sem_init(&semaforo,0,1);
+	sem_init(&semaforo,0,0);
 	pthread_t threads[2];
 	long taskids[2];
 
-	for (int i = 0; i < 2; i++) {
-		taskids[i] = i;
 
 
 		
-		pthread_create(&threads[i], NULL, printearA, (void*)taskids[i]);
-		sem_post(&semaforo);
-		sem_wait(&semaforo);
-		pthread_create(&threads[i], NULL, printearB, (void*)taskids[i]);
+		pthread_create(&threads[0], NULL, printearA, (void*)taskids[0]);
+		pthread_create(&threads[1], NULL, printearB, (void*)taskids[1]);
 
-	}
+	
 
 	for (int i = 0; i < 2; i++){
 		pthread_join(threads[i],NULL);
